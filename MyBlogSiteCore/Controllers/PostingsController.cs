@@ -13,33 +13,30 @@ namespace MyBlogSiteCore.Controllers
 {
     public class PostingsController : Controller
     {
-        private readonly ApplicationDbContext _context;
         private readonly IPostings _postings;
+        private readonly ApplicationDbContext _context;
 
-        public PostingsController(ApplicationDbContext context, IPostings postings)
+        public PostingsController(IPostings postings, ApplicationDbContext context)
         {
-            _context = context;
             _postings = postings;
+            _context = context;
         }
 
         // GET: Postings
         public async Task<IActionResult> Index()
         {
-              return _context.Postings != null ? 
-                          View(await _context.Postings.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Postings'  is null.");
+            return View(await _postings.GetAllAsync());
         }
 
         // GET: Postings/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Postings == null)
+            if (id == null || _postings == null)
             {
                 return NotFound();
             }
 
-            var posting = await _context.Postings
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var posting = await _postings.GetAsync(id);
             if (posting == null)
             {
                 return NotFound();
@@ -92,8 +89,6 @@ namespace MyBlogSiteCore.Controllers
             {
                 try
                 {
-                    //_context.Update(posting);
-                    //await _context.SaveChangesAsync();
                     await _postings.EditAsync(posting);
                 }
                 catch (DbUpdateConcurrencyException)
@@ -115,7 +110,7 @@ namespace MyBlogSiteCore.Controllers
         // GET: Postings/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Postings == null)
+            if (id == null || _postings == null)
             {
                 return NotFound();
             }
@@ -137,23 +132,22 @@ namespace MyBlogSiteCore.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Postings == null)
+            if (_postings == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.Postings'  is null.");
             }
-            var posting = await _context.Postings.FindAsync(id);
+            var posting = await _postings.GetAsync(id);
             if (posting != null)
             {
-                _context.Postings.Remove(posting);
+                _postings.Delete(posting);
             }
             
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool PostingExists(int id)
         {
-          return (_context.Postings?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Postings?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

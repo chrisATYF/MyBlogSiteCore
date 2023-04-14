@@ -22,9 +22,10 @@ namespace MyBlogSiteCore.Services
             return model;
         }
 
-        public async Task<Posting> DeleteAsync(Posting model)
+        public void Delete(Posting model)
         {
-            throw new NotImplementedException();
+            _context.Postings.Remove(model);
+            _context.SaveChanges();
         }
 
         public async Task<Posting> EditAsync(Posting model)
@@ -37,7 +38,7 @@ namespace MyBlogSiteCore.Services
 
         public async Task<List<Posting>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Postings.ToListAsync();
         }
 
         public async Task<Posting> GetAsync(int? id)

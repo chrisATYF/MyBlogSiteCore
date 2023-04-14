@@ -8,6 +8,6 @@ namespace MyBlogSiteCore.Services.Interfaces
         Task<Posting> GetAsync(int? id);
         Task<Posting> AddAsync(Posting model);
         Task<Posting> EditAsync(Posting model);
-        Task<Posting> DeleteAsync(Posting model);
+        void Delete(Posting model);
     }
 }
